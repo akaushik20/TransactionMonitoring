@@ -1,0 +1,57 @@
+
+FALSE POSITIVE RATE ANALYSIS REPORT
+Generated on: 2026-01-31 12:00:45
+================================
+
+EXECUTIVE SUMMARY
+-----------------
+Overall False Positive Rate: 0.736 (73.6%)
+Total False Positives: 736
+Total True Positives: 264
+Total Alerts: 1,000
+
+DETAILED ANALYSIS
+-----------------
+
+1. OVERALL PERFORMANCE
+   - Dataset Size: 1,000 alerts
+   - False Positive Rate: 73.6%
+   - True Positive Rate: 26.4%
+   - Alert Effectiveness: 26.4% of alerts are valid
+
+2. FALSE POSITIVE RATE BY ALERT TYPE
+   - high_risk_jurisdiction: 0.769 (76.9%) - 143/186 alerts
+   - large_value: 0.803 (80.3%) - 155/193 alerts
+   - rapid_in_outflow: 0.738 (73.8%) - 152/206 alerts
+   - structuring: 0.634 (63.4%) - 128/202 alerts
+   - velocity: 0.742 (74.2%) - 158/213 alerts
+
+3. FALSE POSITIVE RATE BY CUSTOMER RISK TIER
+   - high: 0.769 (76.9%) - 70/91 alerts
+   - low: 0.746 (74.6%) - 455/610 alerts
+   - medium: 0.706 (70.6%) - 211/299 alerts
+
+4. FALSE POSITIVE RATE BY COUNTRY (TOP 10)
+   - SG: 0.819 (81.9%) - 77/94 alerts
+   - GB: 0.777 (77.7%) - 73/94 alerts
+   - FR: 0.767 (76.7%) - 79/103 alerts
+   - AU: 0.766 (76.6%) - 72/94 alerts
+   - HK: 0.765 (76.5%) - 75/98 alerts
+   - BR: 0.745 (74.5%) - 76/102 alerts
+   - US: 0.719 (71.9%) - 82/114 alerts
+   - JP: 0.697 (69.7%) - 69/99 alerts
+   - IN: 0.673 (67.3%) - 72/107 alerts
+   - DE: 0.642 (64.2%) - 61/95 alerts
+
+
+RECOMMENDATIONS
+---------------
+- HIGH FPR: Consider raising alert thresholds to reduce false positives
+- Review alert types with highest FPR for threshold adjustments
+- Monitor performance by customer risk tiers and geographic regions
+- Consider model retraining if FPR is consistently high
+
+VISUAL ANALYSIS
+---------------
+- Charts saved as: false_positive_analysis.png
+- EDA Report: transaction_monitoring_report.html
