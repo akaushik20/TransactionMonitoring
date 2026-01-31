@@ -1,8 +1,7 @@
 import pandas as pd
 import yaml
-from ydata_profiling import ProfileReport
 
-from helper.function import load_data
+from helper.function import load_data, generate_eda_report
 
 if __name__=="__main__":
     ## REad config
@@ -19,7 +18,5 @@ if __name__=="__main__":
 
     ## Initial data exploration
     ## Using ydata-profiling for EDA
-    profile = ProfileReport(df, title="Transaction Monitoring Data Report")
-    profile.to_file("transaction_monitoring_report.html")
-    print("EDA report saved as 'transaction_monitoring_report.html'")
+    generate_eda_report(df, "Transaction Monitoring Data Report", "transaction_monitoring_report.html")
     
