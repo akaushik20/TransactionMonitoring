@@ -52,6 +52,8 @@ multimethod==1.12
     # via
     #   visions
     #   ydata-profiling
+narwhals==2.15.0
+    # via plotly
 networkx==3.6.1
     # via visions
 numba==0.62.1
@@ -75,6 +77,7 @@ numpy==2.3.5
 packaging==26.0
     # via
     #   matplotlib
+    #   plotly
     #   statsmodels
 pandas==2.3.3
     # via
@@ -94,6 +97,8 @@ pillow==12.1.0
     #   matplotlib
     #   visions
     #   wordcloud
+plotly==6.5.2
+    # via -r requirements.in
 puremagic==1.30
     # via visions
 pydantic==2.12.5
