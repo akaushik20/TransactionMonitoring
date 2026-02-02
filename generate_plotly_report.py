@@ -41,15 +41,10 @@ def create_interactive_report(df: pd.DataFrame, output_file: str = "transaction_
             lambda x: (x == 'false_positive').sum() / len(x) if len(x) > 0 else 0
         ).sort_values(ascending=False)
         
-        # Debug: Print the data being plotted
-        print("DEBUG - FPR by Alert Type data:")
-        for alert_type, fpr in fpr_by_type.items():
-            print(f"  {alert_type}: {fpr:.3f} ({fpr:.1%})")
-        
         fig.add_trace(
             go.Bar(
-                x=list(fpr_by_type.index),  # Convert to list explicitly
-                y=list(fpr_by_type.values),  # Convert to list explicitly
+                x=list(fpr_by_type.index),
+                y=list(fpr_by_type.values),
                 marker_color='lightblue',
                 name='FPR by Alert Type',
                 text=[f"{val:.1%}" for val in fpr_by_type.values],
@@ -65,15 +60,10 @@ def create_interactive_report(df: pd.DataFrame, output_file: str = "transaction_
             lambda x: (x == 'false_positive').sum() / len(x) if len(x) > 0 else 0
         ).sort_values(ascending=False)
         
-        # Debug: Print the data being plotted
-        print("DEBUG - FPR by Risk Tier data:")
-        for risk_tier, fpr in fpr_by_risk.items():
-            print(f"  {risk_tier}: {fpr:.3f} ({fpr:.1%})")
-        
         fig.add_trace(
             go.Bar(
-                x=list(fpr_by_risk.index),  # Convert to list explicitly
-                y=list(fpr_by_risk.values),  # Convert to list explicitly
+                x=list(fpr_by_risk.index),
+                y=list(fpr_by_risk.values),
                 marker_color='lightgreen',
                 name='FPR by Risk Tier',
                 text=[f"{val:.1%}" for val in fpr_by_risk.values],
@@ -89,15 +79,10 @@ def create_interactive_report(df: pd.DataFrame, output_file: str = "transaction_
             lambda x: (x == 'false_positive').sum() / len(x) if len(x) > 0 else 0
         ).sort_values(ascending=False).head(10)
         
-        # Debug: Print the data being plotted
-        print("DEBUG - FPR by Country data:")
-        for country, fpr in fpr_by_country.items():
-            print(f"  {country}: {fpr:.3f} ({fpr:.1%})")
-        
         fig.add_trace(
             go.Bar(
-                x=list(fpr_by_country.index),  # Convert to list explicitly
-                y=list(fpr_by_country.values),  # Convert to list explicitly
+                x=list(fpr_by_country.index),
+                y=list(fpr_by_country.values),
                 marker_color='gold',
                 name='FPR by Country',
                 text=[f"{val:.1%}" for val in fpr_by_country.values],
@@ -126,49 +111,30 @@ def create_interactive_report(df: pd.DataFrame, output_file: str = "transaction_
     fig.update_yaxes(range=[0, 1], row=2, col=2)
     
     # Section 2: Time to Disposition Analysis
-    fig2 = make_subplots(
-        rows=1, cols=2,
-        subplot_titles=('Overall Time to Disposition Distribution', 'Time to Disposition by Alert Type'),
-        specs=[[{"type": "histogram"}, {"type": "box"}]]
-    )
+    fig2 = go.Figure()
     
-    # Overall time to disposition histogram
-    if 'time_to_disposition_days' in df.columns:
-        fig2.add_trace(
-            go.Histogram(
-                x=df['time_to_disposition_days'],
-                nbinsx=20,
-                marker_color='skyblue',
-                name='Time Distribution',
-                showlegend=False
-            ),
-            row=1, col=1
-        )
+    # Simple bar chart showing average time by alert type
+    if 'time_to_disposition_days' in df.columns and 'alert_type' in df.columns:
+        avg_time_by_type = df.groupby('alert_type')['time_to_disposition_days'].mean().sort_values(ascending=False)
         
-        # Box plot by alert type
-        if 'alert_type' in df.columns:
-            for alert_type in df['alert_type'].unique():
-                type_data = df[df['alert_type'] == alert_type]['time_to_disposition_days']
-                fig2.add_trace(
-                    go.Box(
-                        y=type_data,
-                        name=alert_type,
-                        boxmean=True,
-                        showlegend=False
-                    ),
-                    row=1, col=2
-                )
+        fig2.add_trace(
+            go.Bar(
+                x=list(avg_time_by_type.index),
+                y=list(avg_time_by_type.values),
+                marker_color='lightcoral',
+                text=[f"{val:.1f}" for val in avg_time_by_type.values],
+                textposition='outside'
+            )
+        )
     
     fig2.update_layout(
-        title_text="Section 2: Time to Disposition Analysis",
+        title="Section 2: Average Time to Disposition by Alert Type",
         title_x=0.5,
-        height=400
+        height=400,
+        xaxis_title="Alert Type",
+        yaxis_title="Average Days",
+        showlegend=False
     )
-    
-    fig2.update_xaxes(title_text="Days", row=1, col=1)
-    fig2.update_yaxes(title_text="Count", row=1, col=1)
-    fig2.update_xaxes(title_text="Alert Type", row=1, col=2)
-    fig2.update_yaxes(title_text="Days", row=1, col=2)
     
     # Create HTML content
     html_content = f"""
