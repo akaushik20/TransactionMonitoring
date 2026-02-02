@@ -32,5 +32,5 @@ if __name__=="__main__":
 
     ## Initial data exploration
     ## Using ydata-profiling for EDA
-    generate_eda_report(df, "Transaction Monitoring Data Report", "transaction_monitoring_report.html")
+    generate_eda_report(df, "Transaction Monitoring Data Report", "EDA_report.html")
     

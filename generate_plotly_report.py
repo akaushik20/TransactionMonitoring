@@ -136,6 +136,29 @@ def create_interactive_report(df: pd.DataFrame, output_file: str = "transaction_
         showlegend=False
     )
     
+    # Section 3: Time Distribution by Alert Type (Box Plot)
+    fig3 = go.Figure()
+    
+    if 'time_to_disposition_days' in df.columns and 'alert_type' in df.columns:
+        for alert_type in df['alert_type'].unique():
+            type_data = df[df['alert_type'] == alert_type]['time_to_disposition_days'].tolist()
+            fig3.add_trace(
+                go.Box(
+                    y=type_data,
+                    name=str(alert_type),
+                    boxmean=True
+                )
+            )
+    
+    fig3.update_layout(
+        title="Section 3: Time to Disposition Distribution by Alert Type",
+        title_x=0.5,
+        height=400,
+        xaxis_title="Alert Type",
+        yaxis_title="Days",
+        showlegend=False
+    )
+    
     # Create HTML content
     html_content = f"""
 <!DOCTYPE html>
@@ -186,6 +209,11 @@ def create_interactive_report(df: pd.DataFrame, output_file: str = "transaction_
         <h2>Section 2: Time to Disposition Analysis</h2>
         <div id="charts2">{fig2.to_html(full_html=False, include_plotlyjs=False)}</div>
     </div>
+    
+    <div class="section">
+        <h2>Section 3: Time to Disposition Distribution by Alert Type</h2>
+        <div id="charts3">{fig3.to_html(full_html=False, include_plotlyjs=False)}</div>
+    </div>
 </body>
 </html>
 """
@@ -204,4 +232,5 @@ if __name__ == "__main__":
         config = yaml.safe_load(file)
     
     df = pd.read_csv(config["INPUT_DATA_PATH"])
+    print(df.info())
     create_interactive_report(df)
