@@ -143,7 +143,7 @@ def create_interactive_report(df: pd.DataFrame, output_file: str = "transaction_
             )
     
     fig2.update_layout(
-        title="Section 2: Time to Disposition Analysis by Alert Type",
+        title="Time to Disposition Analysis by Alert Type",
         title_x=0.5,
         height=450,
         showlegend=False
@@ -182,7 +182,7 @@ def create_interactive_report(df: pd.DataFrame, output_file: str = "transaction_
         df.drop('amount_bin', axis=1, inplace=True)
     
     fig3.update_layout(
-        title="Section 3: True Positive Rate by Alert Amount",
+        title="True Positive Rate by Alert Amount",
         title_x=0.5,
         height=400,
         xaxis_title="Alert Amount Range (USD)",
@@ -229,12 +229,57 @@ def create_interactive_report(df: pd.DataFrame, output_file: str = "transaction_
         df.drop('is_tp', axis=1, inplace=True)
     
     fig4.update_layout(
-        title="Section 4: True Positive Rate by Country and Risk Tier",
+        title="True Positive Rate by Country and Risk Tier",
         title_x=0.5,
         height=450,
         xaxis_title="Customer Risk Tier",
         yaxis_title="Country"
     )
+    
+    # Section 5: Precision by Segment (TP / (TP + FP))
+    fig5 = make_subplots(
+        rows=1, cols=3,
+        subplot_titles=('By Alert Type', 'By Risk Tier', 'By Country')
+    )
+    
+    if 'alert_outcome' in df.columns:
+        # Precision by Alert Type
+        precision_by_type = df.groupby('alert_type', observed=True).apply(
+            lambda x: (x['alert_outcome'] == 'true_positive').sum() / len(x), include_groups=False
+        ).sort_values(ascending=False)
+        fig5.add_trace(
+            go.Bar(x=list(precision_by_type.index), y=list(precision_by_type.values),
+                   marker_color='mediumseagreen', text=[f"{v:.1%}" for v in precision_by_type.values], textposition='outside'),
+            row=1, col=1
+        )
+        
+        # Precision by Risk Tier
+        precision_by_tier = df.groupby('customer_risk_tier', observed=True).apply(
+            lambda x: (x['alert_outcome'] == 'true_positive').sum() / len(x), include_groups=False
+        ).sort_values(ascending=False)
+        fig5.add_trace(
+            go.Bar(x=list(precision_by_tier.index), y=list(precision_by_tier.values),
+                   marker_color='mediumseagreen', text=[f"{v:.1%}" for v in precision_by_tier.values], textposition='outside'),
+            row=1, col=2
+        )
+        
+        # Precision by Country (top 10)
+        precision_by_country = df.groupby('country', observed=True).apply(
+            lambda x: (x['alert_outcome'] == 'true_positive').sum() / len(x), include_groups=False
+        ).sort_values(ascending=False).head(10)
+        fig5.add_trace(
+            go.Bar(x=list(precision_by_country.index), y=list(precision_by_country.values),
+                   marker_color='mediumseagreen', text=[f"{v:.1%}" for v in precision_by_country.values], textposition='outside'),
+            row=1, col=3
+        )
+    
+    fig5.update_layout(
+        title="Precision by Segment (TP / Total Alerts)",
+        title_x=0.5,
+        height=400,
+        showlegend=False
+    )
+    fig5.update_yaxes(tickformat='.0%', range=[0, 0.5])
     
     # Create HTML content
     html_content = f"""
@@ -298,6 +343,12 @@ def create_interactive_report(df: pd.DataFrame, output_file: str = "transaction_
         <p style="color: #666; margin-bottom: 10px;">Are there countries or risk tiers with unusually high or low true positive rates?</p>
         <div id="charts4">{fig4.to_html(full_html=False, include_plotlyjs=False)}</div>
     </div>
+    
+    <div class="section">
+        <h2>Section 5: Precision by Segment</h2>
+        <p style="color: #666; margin-bottom: 10px;">Precision = TP / (TP + FP). Higher precision means fewer false alarms in that segment.</p>
+        <div id="charts5">{fig5.to_html(full_html=False, include_plotlyjs=False)}</div>
+    </div>
 </body>
 </html>
 """
@@ -310,11 +361,8 @@ def create_interactive_report(df: pd.DataFrame, output_file: str = "transaction_
 
 if __name__ == "__main__":
     # This allows the script to be run independently for testing
-    
-    
     with open("config.yaml", 'r') as file:
         config = yaml.safe_load(file)
     
     df = pd.read_csv(config["INPUT_DATA_PATH"])
-    print(df.info())
     create_interactive_report(df)
