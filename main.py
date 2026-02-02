@@ -2,6 +2,7 @@ import pandas as pd
 import yaml
 
 from helper.function import load_data, generate_eda_report, calculate_false_positive_rates, generate_fpr_report
+from generate_plotly_report import create_interactive_report
 
 if __name__=="__main__":
     ## REad config
@@ -22,6 +23,12 @@ if __name__=="__main__":
     print("="*60)
     calculate_false_positive_rates(df)
     generate_fpr_report(df, "false_positive_analysis_report.txt")
+
+    ## Interactive Plotly Report
+    print("\n" + "="*60)
+    print("GENERATING INTERACTIVE PLOTLY REPORT...")
+    print("="*60)
+    create_interactive_report(df, "transaction_monitoring_analysis.html")
 
     ## Initial data exploration
     ## Using ydata-profiling for EDA
